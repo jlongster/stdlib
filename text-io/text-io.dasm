@@ -80,6 +80,7 @@
 ; receives: A (character to be written)
 ; clobbers: A, C
 :putc
+  SET A, POP
   IFE A, 10
     SET PC, newline
   AND A, 0x7f
@@ -257,5 +258,28 @@
   SUB B, A
   SUB B, 1
   ADD A, inputbuf
-  SET PC, POP
 
+  SET PUSH, A
+  SET PUSH, B 
+
+  SET PUSH, return-o12343
+  SET PUSH, 0
+  SET PUSH, B
+  SET PC, malloc
+:return-o12343
+
+  SET B, POP
+  SET A, POP
+
+  SET PUSH, J
+
+  SET PUSH, return-o324523
+  SET PUSH, A
+  SET PUSH, J
+  SET PUSH, B
+  SET PC, memmove
+:return-o324523
+
+  SET POP, J
+
+  SET PC, POP

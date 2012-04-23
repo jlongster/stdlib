@@ -6,13 +6,23 @@
 ;; http://u.jdiez.me/0x42c/kernel.html#x022-kern-free
 ;; declares: malloc, free
 
-:mem_start dat 0x6000 ; adjust these to your liking.
-:mem_end dat 0x7fff
+:mem_start dat __end ; adjust these to your liking.
+:mem_end dat 0       ; initialized in alloc_init
 
-; void* malloc(int owner, int words)
+:alloc_init
+    SET J, 0x1fff
+    SET [mem_end], [mem_start+J]
+
+    SET A, [mem_start]
+    SET B, [mem_end]
+    JSR set_initial_blocks
+    SET PC, POP
+
+; void* malloc(int words, int owner)
 :malloc
-    set push, i
     set i, [mem_start]
+    set A, POP
+    set B, POP
     
     :malloc_loop
         ife [i], 0xffff
@@ -78,13 +88,13 @@
         set pc, malloc_end
            
     :malloc_end
-        set a, pop
-        add a, 2 ; real start of memory
-        set i, pop
+        set J, pop
+        add J, 2 ; real start of memory
         set pc, pop
 
 ; void free(void* addr) 
 :free
+    set a, pop
     sub a, 2 ; user gives the first allocated word, header is two words back  
     set [a], 0xffff ; free memory
     set push, a

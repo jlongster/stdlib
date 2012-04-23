@@ -18,6 +18,10 @@
 ; clobbers: A, B, C
 ; returns:
 :memmove
+  SET C, POP
+  SET B, POP
+  SET A, POP
+
   ; src and dst are the same, nothing to do
   IFE A, B
     SET PC, POP
